@@ -1,9 +1,10 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pprint
+import time
 from splinter import Browser
-from selenium import webdriver
+import jsonify
+
 
 
 
@@ -22,14 +23,14 @@ def scrape():
 
 	news=soup.find("li", class_ = "slide")
 	news_title=news.find("div", class_ = "content_title").text
-	news_title
+	
 
 	p=soup.find("li", class_ = "slide")
 	news_p=p.find("div", class_ = "article_teaser_body").text
-	news_p
+	
 
-	time.sleep(2)
-
+	# time.sleep(2)
+	
 		###FEATURED IMAGE###
 	executable_path = {'executable_path': '/usr/local/bin/chromedriver'}
 	browser = Browser('chrome', **executable_path)
@@ -60,10 +61,12 @@ def scrape():
 	browser.visit(url)
 
 	table1=soup.find("table", class_ = "tablepress tablepress-id-p-mars")
-	table=table1.find("tbody").text
-	table
+	# table=table1.find("tbody").text
+	
 
 	time.sleep(2)
+
+
 		###HEMISPHERES###
 
 	executable_path = {'executable_path': '/usr/local/bin/chromedriver'}
@@ -75,20 +78,21 @@ def scrape():
 
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/cerberus_enhanced"
 	browser.visit(url)
-	hem1=browser.click_link_by_partial_text('Sample')
+	# hem1=browser.links.find_by_partial_text('Sample').select_one()
+	hem1=browser.('Sample').select_one()
 
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/schiaparelli_enhanced"
 	browser.visit(url)
-	hem2=browser.click_link_by_partial_text('Sample')
+	hem2=browser.links.find_by_partial_text('Sample').select_one()
 
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/syrtis_major_enhanced"
 	browser.visit(url)
-	hem3=browser.click_link_by_partial_text('Sample')
+	hem3=browser.links.find_by_partial_text('Sample').select_one()
 
 
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/valles_marineris_enhanced"
 	browser.visit(url)
-	hem4=browser.click_link_by_partial_text('Sample')
+	hem4=browser.click_link_by_partial_text('Sample').select_one()
 
 
 	time.sleep(2)
@@ -99,7 +103,7 @@ def scrape():
 		"new_title": news_title,
 		"news_info": news_p,
 		"featured_img": featured_img,
-		"table": table,
+		"table": table1,
 		"hem1": hem1,
 		"hem2": hem2,
 		"hem3": hem3,
@@ -107,5 +111,5 @@ def scrape():
 		}
 
 
-	return result
+	return (result)
 
