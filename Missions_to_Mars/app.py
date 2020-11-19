@@ -1,6 +1,6 @@
 from scrape_mars import scrape
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_pymongo import PyMongo
 
 
@@ -21,12 +21,12 @@ app = Flask(__name__)
 def main():
     mars = db.mars.find_one()
     print(mars)
-    return mars
+    return render_template("index.html")
 
 @app.route("/scraping")
 def scraping():
     mars_dict = scrape()
-    return "success"
+    return "Scraping successful! To view your data, visit {{main}}"
 
 if __name__ == "__main__":
     app.run(debug=True)
