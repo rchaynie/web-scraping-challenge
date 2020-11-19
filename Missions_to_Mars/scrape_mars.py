@@ -4,13 +4,16 @@ from bs4 import BeautifulSoup
 import time
 from splinter import Browser
 import jsonify
-import json
+import pymongo
+
+
+CONN = "mongodb+srv://mongo_user:mmwp6FJ39lK7iAhE@cluster0.28agz.mongodb.net/db?retryWrites=true&w=majority"
+client = pymongo.MongoClient(CONN)
+db = client.mars
 
 
 
-
-
-def web_scrape():
+def scrape():
 
 	executable_path = {'executable_path': '/usr/local/bin/chromedriver'}
 	browser = Browser('chrome', **executable_path)
@@ -30,6 +33,8 @@ def web_scrape():
 	p=soup.find("li", class_ = "slide")
 	news_p=p.find("div", class_ = "article_teaser_body").text
 
+	
+
 	# Scrape featured image
 
 	url="https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
@@ -48,9 +53,12 @@ def web_scrape():
 
 	# concat with web url nasa.gov
 	featured_image= "https://www.jpl.nasa.gov"+img_tag
+	featured_image=[featured_image]
 
 	html=browser.html
 	soup=BeautifulSoup(html, "html.parser")
+
+
 
 	# Scrape Mars table
 	url="https://space-facts.com/mars/"
@@ -59,6 +67,7 @@ def web_scrape():
 	table1=soup.find("table", class_ = "tablepress tablepress-id-p-mars")
 	# table=table1.find("tbody").text
 	table1
+
 
 	# Hemisphere
 
@@ -71,7 +80,7 @@ def web_scrape():
 	# hem1
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/cerberus_enhanced"
 	browser.visit(url)
-	hem1=browser.find_link_by_partial_text('Sample')[0]['href'].encode("utf-8")
+	hem1=browser.find_link_by_partial_text('Sample')[0]['href']
 
 	# hem2
 	url="https://astrogeology.usgs.gov/search/map/Mars/Viking/schiaparelli_enhanced"
@@ -88,14 +97,18 @@ def web_scrape():
 	browser.visit(url)
 	hem4=browser.find_link_by_partial_text('Sample')[0]['href']
 
-	data_dict = json.dumps({
+	hemispheres=[hem1, hem2, hem3, hem4]
+	
+
+	mars_dict = {}
+	mars_dict = {
 		"news_title": news_title,
 		"news_p": news_p,
 		"featured_img": featured_img,
-		"hem1": hem1,
-		"hem2": hem2,
-		"hem3": hem3
-	})
+		"hemispheres": hemispheres
+	}
 
-	return data_dict
+	db.mars.drop()
+	db.mars.insert_one(mars_dict)
+	return mars_dict
 
